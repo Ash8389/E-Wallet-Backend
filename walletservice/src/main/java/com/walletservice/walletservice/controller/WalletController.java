@@ -20,7 +20,7 @@ public class WalletController {
         this.walletService = walletService;
     }
 
-    @PostMapping("/createWallet/{userId}")
+    @PostMapping("/{userId}")
     public Wallet createWallet(@PathVariable Long userId){
         return walletService.createWallet(userId);
     }

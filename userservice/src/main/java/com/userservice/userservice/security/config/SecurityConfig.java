@@ -25,7 +25,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain SecurityFilterChain(HttpSecurity http){
         http.authorizeHttpRequests( auth -> auth
-                .requestMatchers("/register", "/login")
+                .requestMatchers("/users/register", "/users/login")
                 .permitAll()
                 .anyRequest()
                 .authenticated()
