@@ -4,6 +4,7 @@ public class TransferRequest {
     private Long senderId;
     private Long receiverId;
     private Double amount;
+    private Long transactionId;
 
     public Long getSenderId() {
         return senderId;
@@ -27,5 +28,13 @@ public class TransferRequest {
 
     public void setAmount(Double amount) {
         this.amount = amount;
+    }
+
+    public Long getTransactionId() {
+        return transactionId;
+    }
+
+    public void setTransactionId(Long transactionId) {
+        this.transactionId = transactionId;
     }
 }

@@ -28,6 +28,7 @@ public class TransactionService {
         Optional<Transaction> te = transactionRepo.findByIdempotencyKey(key);
         
         if(te.isPresent()){
+            System.out.println(te.get().getId());
             return te.get();
         }
 
@@ -42,8 +43,9 @@ public class TransactionService {
 
         tx = transactionRepo.save(tx);
 
-        Status st = walletClientService.transferService(request.getSenderId(), request.getReceiverId(), request.getAmount());
+        Status st = walletClientService.transferService(request.getSenderId(), request.getReceiverId(), request.getAmount(), tx.getId());
         tx.setStatus(st);
+        transactionRepo.save(tx);
 
         producerService.produceEvent(st);
 
@@ -61,6 +63,7 @@ public class TransactionService {
 //
 //        System.out.println("Result Stored");
 //    }
+
 
     public List<Transaction> getTransaction(Long senderId){
         return transactionRepo.findBySenderId(senderId);

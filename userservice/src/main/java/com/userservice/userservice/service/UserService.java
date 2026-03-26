@@ -2,27 +2,39 @@ package com.userservice.userservice.service;
 
 import com.userservice.userservice.dtos.RegisterRequest;
 import com.userservice.userservice.dtos.RegisterResponse;
+import com.userservice.userservice.dtos.UserDetail;
 import com.userservice.userservice.model.User;
 import com.userservice.userservice.repository.UserRepo;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 public class UserService {
 
     private UserRepo userRepo;
-
     private PasswordEncoder passwordEncoder;
+    private StringRedisTemplate redisTemplate;
+    private ObjectMapper objectMapper;
 
 
-    UserService(UserRepo userRepo, PasswordEncoder passwordEncoder){
+    UserService(UserRepo userRepo,
+                PasswordEncoder passwordEncoder,
+                StringRedisTemplate redisTemplate,
+                ObjectMapper objectMapper) {
         this.userRepo = userRepo;
         this.passwordEncoder = passwordEncoder;
+        this.redisTemplate = redisTemplate;
+        this.objectMapper = objectMapper;
     }
 
     public RegisterResponse register(RegisterRequest registerUser){
@@ -41,5 +53,38 @@ public class UserService {
         registerResponse.setCreatedAt(savedUser.getCreatedAt());
 
         return registerResponse;
+    }
+
+    public UserDetail getUserDetail(String email) {
+
+        String key = "userMail:" + email;
+
+        String jsonUser = redisTemplate.opsForValue().get(key);
+
+        if(jsonUser != null){
+            try{
+                return objectMapper.readValue(jsonUser, UserDetail.class);
+            } catch (Exception e) {
+                throw new RuntimeException("Redis Read fail : " + e);
+            }
+        }
+
+        User user = userRepo.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User Not found"));
+
+        UserDetail response = new UserDetail(
+                user.getId(),
+                user.getName(),
+                user.getEmail()
+        );
+
+        try{
+            String json = objectMapper.writeValueAsString(response);
+            redisTemplate.opsForValue().set(key, json);
+        } catch (Exception e) {
+            throw new RuntimeException("Redis write fail : " + e);
+        }
+
+        return response;
     }
 }

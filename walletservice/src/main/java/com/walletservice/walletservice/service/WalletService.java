@@ -6,7 +6,9 @@ import com.walletservice.walletservice.dtos.CreditResponse;
 import com.walletservice.walletservice.dtos.DebitRequest;
 import com.walletservice.walletservice.dtos.DebitResponse;
 import com.walletservice.walletservice.model.Wallet;
+import com.walletservice.walletservice.model.WalletTransaction;
 import com.walletservice.walletservice.repository.WalletRepo;
+import com.walletservice.walletservice.repository.WalletTransactionRepo;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,12 +19,19 @@ import java.util.Optional;
 public class WalletService {
 
     private final WalletRepo walletRepo;
+    private final WalletTransactionRepo walletTransactionRepo;
 
-    WalletService(WalletRepo walletRepo){
+    WalletService(WalletRepo walletRepo, WalletTransactionRepo walletTransactionRepo){
         this.walletRepo = walletRepo;
+        this.walletTransactionRepo = walletTransactionRepo;
     }
 
     public Wallet createWallet(Long userId){
+        Optional<Wallet> exist = walletRepo.findByUserId(userId);
+        if(exist.isPresent()){
+            return exist.get();
+        }
+
         Wallet wallet = new Wallet();
 
         wallet.setUserId(userId);
@@ -36,6 +45,13 @@ public class WalletService {
     public Wallet getWallet(Long userId){
         return walletRepo.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Wallet not found"));
+    }
+
+    public Double getBalance(Long userId){
+        Wallet wallet = walletRepo.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("Wallet not found"));
+
+        return wallet.getBalance();
     }
 
     public CreditResponse credit(Long senderId , Double amount){
@@ -71,7 +87,7 @@ public class WalletService {
     }
 
     @Transactional
-    public Status transfer(Long senderId, Long receiverId, Double amount) {
+    public Status transfer(Long senderId, Long receiverId, Double amount, Long transactionId) {
         Wallet senderWallet = walletRepo.findByUserIdForUpdate(senderId)
                 .orElseThrow();
 
@@ -83,7 +99,27 @@ public class WalletService {
                 .orElseThrow();
 
         senderWallet.setBalance(senderWallet.getBalance() - amount);
+
+        WalletTransaction debit = new WalletTransaction(
+                senderWallet.getId(),
+                amount,
+                "Debit",
+                transactionId
+        );
+        walletTransactionRepo.save(debit);
         receiverWallet.setBalance(receiverWallet.getBalance() + amount);
+
+        WalletTransaction credit = new WalletTransaction(
+                receiverWallet.getId(),
+                amount,
+                "Credit",
+                transactionId
+        );
+
+        walletTransactionRepo.save(credit);
+
+        walletRepo.save(senderWallet);
+        walletRepo.save(receiverWallet);
 
         return Status.DONE;
     }

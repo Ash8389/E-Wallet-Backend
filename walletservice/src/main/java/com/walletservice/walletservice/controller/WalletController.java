@@ -50,6 +50,6 @@ public class WalletController {
     public Status transfer(@RequestBody TransferRequest transferRequest){
 
         System.out.println("transfer");
-        return walletService.transfer(transferRequest.getSenderId(), transferRequest.getReceiverId(), transferRequest.getAmount());
+        return walletService.transfer(transferRequest.getSenderId(), transferRequest.getReceiverId(), transferRequest.getAmount(), transferRequest.getTransactionId());
     }
 }

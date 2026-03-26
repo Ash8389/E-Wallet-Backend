@@ -19,19 +19,20 @@ public class WalletClientService {
 
     @CircuitBreaker(name = "walletService", fallbackMethod = "fallbackTransaction")
     @Retry(name = "walletService")
-    public Status transferService(Long senderId, Long receiverId, Double amount){
+    public Status transferService(Long senderId, Long receiverId, Double amount, Long transactionId){
         return restTemplate.postForObject(
                 "http://localhost:8082/wallet/transfer",
                 Map.of(
                         "senderId", senderId,
                         "receiverId" ,receiverId,
-                        "amount" , amount
+                        "amount" , amount,
+                        "transactionId", transactionId
                 ),
                 Status.class
         );
     }
 
-    public Status fallbackTransaction(Long senderId, Long receiverId, Double amount, Exception ex){
+    public Status fallbackTransaction(Long senderId, Long receiverId, Double amount, Long transactionId, Exception ex){
         System.out.println("🔥 FALLBACK CALLED: " + ex.getMessage());
 
         return Status.FAILED;

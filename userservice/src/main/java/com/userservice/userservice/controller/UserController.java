@@ -2,6 +2,7 @@ package com.userservice.userservice.controller;
 
 import com.userservice.userservice.dtos.RegisterRequest;
 import com.userservice.userservice.dtos.RegisterResponse;
+import com.userservice.userservice.dtos.UserDetail;
 import com.userservice.userservice.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,11 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity<RegisterResponse> register(@RequestBody RegisterRequest registerRequest){
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.register(registerRequest));
+    }
+
+    @GetMapping("/{username}")
+    public ResponseEntity<UserDetail> getUser(@PathVariable("username") String username) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.getUserDetail(username));
     }
 
 }
