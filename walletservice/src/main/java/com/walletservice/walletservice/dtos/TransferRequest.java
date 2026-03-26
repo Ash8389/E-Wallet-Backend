@@ -1,6 +1,6 @@
-package com.transactionservice.transactionservice.dto;
+package com.walletservice.walletservice.dtos;
 
-public class TransactionRequest {
+public class TransferRequest {
     private Long senderId;
     private Long receiverId;
     private Double amount;

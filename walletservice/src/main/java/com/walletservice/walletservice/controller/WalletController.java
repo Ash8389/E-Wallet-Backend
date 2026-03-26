@@ -1,9 +1,7 @@
 package com.walletservice.walletservice.controller;
 
-import com.walletservice.walletservice.dtos.CreditRequest;
-import com.walletservice.walletservice.dtos.CreditResponse;
-import com.walletservice.walletservice.dtos.DebitRequest;
-import com.walletservice.walletservice.dtos.DebitResponse;
+import com.common.dto.Status;
+import com.walletservice.walletservice.dtos.*;
 import com.walletservice.walletservice.model.Wallet;
 import com.walletservice.walletservice.service.WalletService;
 import org.springframework.http.HttpStatus;
@@ -32,19 +30,26 @@ public class WalletController {
 
     @PutMapping("/credit")
     public ResponseEntity<CreditResponse> credit(@RequestBody CreditRequest creditRequest){
-        return ResponseEntity.status(HttpStatus.OK).body(walletService.credit(creditRequest));
+        return ResponseEntity.status(HttpStatus.OK).body(walletService.credit(creditRequest.getUserId(), creditRequest.getAmount()));
     }
 
     @PutMapping("/debit")
     public ResponseEntity<DebitResponse> debit(@RequestBody DebitRequest debitRequest){
 
         System.out.println("Debit");
-        DebitResponse debit = walletService.debit(debitRequest);
+        DebitResponse debit = walletService.debit(debitRequest.getUserId(), debitRequest.getAmount() );
 
         if(debit == null){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(debit);
+    }
+
+    @PostMapping("/transfer")
+    public Status transfer(@RequestBody TransferRequest transferRequest){
+
+        System.out.println("transfer");
+        return walletService.transfer(transferRequest.getSenderId(), transferRequest.getReceiverId(), transferRequest.getAmount());
     }
 }

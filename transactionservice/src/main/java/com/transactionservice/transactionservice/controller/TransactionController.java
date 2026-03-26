@@ -14,17 +14,21 @@ import java.util.List;
 public class TransactionController {
 
     private TransactionService transactionService;
+
     TransactionController(TransactionService transactionService){
         this.transactionService = transactionService;
     }
 
     @PostMapping("/transfer")
-    public ResponseEntity<Transaction> transfer(@RequestBody TransactionRequest request){
-        return ResponseEntity.status(HttpStatus.CREATED).body(transactionService.transfer(request));
+    public ResponseEntity<?> transfer(
+            @RequestBody TransactionRequest request,
+            @RequestHeader(name = "Idempotency-Key") String key
+    ){
+        return ResponseEntity.status(HttpStatus.CREATED).body(transactionService.transfer(request, key));
     }
 
     @GetMapping("/{senderWalletId}")
-    public ResponseEntity<List<Transaction>> transactions(@PathVariable Long senderWalletId){
+    public ResponseEntity<List<?>> transactions(@PathVariable Long senderWalletId){
         return ResponseEntity.status(HttpStatus.OK).body(transactionService.getTransaction(senderWalletId));
     }
 }

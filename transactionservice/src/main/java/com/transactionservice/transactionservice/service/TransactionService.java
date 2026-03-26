@@ -1,35 +1,68 @@
 package com.transactionservice.transactionservice.service;
+import com.common.dto.Status;
 import com.transactionservice.transactionservice.dto.TransactionRequest;
-import com.transactionservice.transactionservice.model.Status;
 import com.transactionservice.transactionservice.model.Transaction;
 import com.transactionservice.transactionservice.repository.TransactionRepo;
+import com.transactionservice.transactionservice.service.wallet.WalletClientService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class TransactionService {
 
     private TransactionRepo transactionRepo;
+    private WalletClientService walletClientService;
+    private KafkaProducerService producerService;
 
-    TransactionService(TransactionRepo transactionRepo){
+    TransactionService(TransactionRepo transactionRepo, WalletClientService walletClientService, KafkaProducerService producerService){
         this.transactionRepo = transactionRepo;
+        this.walletClientService = walletClientService;
+        this.producerService = producerService;
     }
 
-    public Transaction transfer(TransactionRequest request){
+    public Transaction transfer(TransactionRequest request, String key){
+
+        Optional<Transaction> te = transactionRepo.findByIdempotencyKey(key);
+        
+        if(te.isPresent()){
+            return te.get();
+        }
+
         Transaction tx = new Transaction();
-        tx.setReceiverWalletId(request.getReceiverWalletId());
-        tx.setSenderWalletId(request.getSenderWalletId());
+
+        tx.setReceiverId(request.getReceiverId());
+        tx.setIdempotencyKey(key);
+        tx.setSenderId(request.getSenderId());
         tx.setAmount(request.getAmount());
         tx.setStatus(Status.PENDING);
         tx.setSendAt(LocalDateTime.now());
 
-        return transactionRepo.save(tx);
+        tx = transactionRepo.save(tx);
+
+        Status st = walletClientService.transferService(request.getSenderId(), request.getReceiverId(), request.getAmount());
+        tx.setStatus(st);
+
+        producerService.produceEvent(st);
+
+        return tx;
     }
 
-    public List<Transaction> getTransaction(Long senderWalletId){
-        return transactionRepo.findBySenderWalletId(senderWalletId);
-    }
+//    @KafkaListener(topics = "transaction-topic-result", groupId = "tx-group")
+//    public void handleResult(TransactionEvent event){
+//        Transaction tx = transactionRepo.findById(event.getTransactionId())
+//                .orElseThrow();
+//
+//        tx.setStatus(event.getStatus());
+//
+//        transactionRepo.save(tx);
+//
+//        System.out.println("Result Stored");
+//    }
 
+    public List<Transaction> getTransaction(Long senderId){
+        return transactionRepo.findBySenderId(senderId);
+    }
 }

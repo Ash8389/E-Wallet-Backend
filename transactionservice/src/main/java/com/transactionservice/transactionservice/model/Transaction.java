@@ -1,9 +1,7 @@
 package com.transactionservice.transactionservice.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.common.dto.Status;
+import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
@@ -13,9 +11,12 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long receiverWalletId;
+    @Column(unique = true)
+    private String idempotencyKey;
 
-    private Long senderWalletId;
+    private Long receiverId;
+
+    private Long senderId;
 
     private Double amount;
 
@@ -31,20 +32,28 @@ public class Transaction {
         this.id = id;
     }
 
-    public Long getReceiverWalletId() {
-        return receiverWalletId;
+    public String getIdempotencyKey() {
+        return idempotencyKey;
     }
 
-    public void setReceiverWalletId(Long receiverWalletId) {
-        this.receiverWalletId = receiverWalletId;
+    public void setIdempotencyKey(String idempotencyKey) {
+        this.idempotencyKey = idempotencyKey;
     }
 
-    public Long getSenderWalletId() {
-        return senderWalletId;
+    public Long getReceiverId() {
+        return receiverId;
     }
 
-    public void setSenderWalletId(Long senderWalletId) {
-        this.senderWalletId = senderWalletId;
+    public void setReceiverId(Long receiverId) {
+        this.receiverId = receiverId;
+    }
+
+    public Long getSenderId() {
+        return senderId;
+    }
+
+    public void setSenderId(Long senderId) {
+        this.senderId = senderId;
     }
 
     public Double getAmount() {
