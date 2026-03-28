@@ -28,6 +28,11 @@ public class WalletController {
         return walletService.getWallet(userId);
     }
 
+    @GetMapping("/balance/{userId}")
+    public Double getBalance(@PathVariable Long userId) {
+        return walletService.getBalance(userId);
+    }
+
     @PutMapping("/credit")
     public ResponseEntity<CreditResponse> credit(@RequestBody CreditRequest creditRequest){
         return ResponseEntity.status(HttpStatus.OK).body(walletService.credit(creditRequest.getUserId(), creditRequest.getAmount()));
