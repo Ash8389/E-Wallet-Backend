@@ -1,6 +1,7 @@
 package com.userservice.userservice.security.config;
 
 import com.userservice.userservice.jwt.filter.JwtFilter;
+import com.userservice.userservice.security.service.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,9 +24,14 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain SecurityFilterChain(HttpSecurity http){
-        http.authorizeHttpRequests( auth -> auth
-                .requestMatchers("/users/register", "/users/login")
+    public SecurityFilterChain SecurityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .authorizeHttpRequests( auth -> auth
+                .requestMatchers("/users/register",
+                        "/users/login",
+                        "/v3/api-docs/**",
+                        "/swagger-ui/**",
+                        "/swagger-ui.html")
                 .permitAll()
                 .anyRequest()
                 .authenticated()
@@ -42,7 +48,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration){
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
@@ -50,4 +56,5 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
+
 }

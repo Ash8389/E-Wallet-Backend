@@ -18,18 +18,18 @@ public class WalletController {
         this.walletService = walletService;
     }
 
-    @PostMapping("/{userId}")
-    public Wallet createWallet(@PathVariable Long userId){
+    @PostMapping("/")
+    public Wallet createWallet(@RequestHeader("X-User-Id") Long userId){
         return walletService.createWallet(userId);
     }
 
-    @GetMapping("/{userId}")
-    public Wallet getWallet(@PathVariable Long userId){
+    @GetMapping("/")
+    public Wallet getWallet(@RequestHeader("X-User-Id") Long userId){
         return walletService.getWallet(userId);
     }
 
-    @GetMapping("/balance/{userId}")
-    public Double getBalance(@PathVariable Long userId) {
+    @GetMapping("/balance/")
+    public Double getBalance(@RequestHeader("X-User-Id") Long userId) {
         return walletService.getBalance(userId);
     }
 

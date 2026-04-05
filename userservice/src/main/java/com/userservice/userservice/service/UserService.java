@@ -1,22 +1,16 @@
 package com.userservice.userservice.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.userservice.userservice.dtos.RegisterRequest;
 import com.userservice.userservice.dtos.RegisterResponse;
 import com.userservice.userservice.dtos.UserDetail;
 import com.userservice.userservice.model.User;
 import com.userservice.userservice.repository.UserRepo;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service
 public class UserService {
@@ -24,17 +18,15 @@ public class UserService {
     private UserRepo userRepo;
     private PasswordEncoder passwordEncoder;
     private StringRedisTemplate redisTemplate;
-    private ObjectMapper objectMapper;
+    private ObjectMapper objectMapper = new ObjectMapper();
 
 
     UserService(UserRepo userRepo,
                 PasswordEncoder passwordEncoder,
-                StringRedisTemplate redisTemplate,
-                ObjectMapper objectMapper) {
+                StringRedisTemplate redisTemplate) {
         this.userRepo = userRepo;
         this.passwordEncoder = passwordEncoder;
         this.redisTemplate = redisTemplate;
-        this.objectMapper = objectMapper;
     }
 
     public RegisterResponse register(RegisterRequest registerUser){

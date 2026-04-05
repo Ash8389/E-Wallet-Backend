@@ -1,9 +1,9 @@
 package com.userservice.userservice.security.model;
 
 import com.userservice.userservice.model.User;
-import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.lang.Nullable;
 
 import java.util.Collection;
 import java.util.List;

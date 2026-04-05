@@ -21,14 +21,15 @@ public class TransactionController {
 
     @PostMapping("/transfer")
     public ResponseEntity<?> transfer(
+            @RequestHeader("X-User-Id") Long senderId,
             @RequestBody TransactionRequest request,
             @RequestHeader(name = "Idempotency-Key") String key
     ){
-        return ResponseEntity.status(HttpStatus.CREATED).body(transactionService.transfer(request, key));
+        return ResponseEntity.status(HttpStatus.CREATED).body(transactionService.transfer(senderId, request, key));
     }
 
-    @GetMapping("/{senderWalletId}")
-    public ResponseEntity<List<?>> transactions(@PathVariable Long senderWalletId){
-        return ResponseEntity.status(HttpStatus.OK).body(transactionService.getTransaction(senderWalletId));
+    @GetMapping
+    public ResponseEntity<List<?>> transactions(@RequestHeader(name = "X-User-Id") Long userId){
+        return ResponseEntity.status(HttpStatus.OK).body(transactionService.getTransaction(userId));
     }
 }

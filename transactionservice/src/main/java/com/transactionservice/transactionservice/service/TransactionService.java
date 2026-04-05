@@ -23,7 +23,7 @@ public class TransactionService {
         this.producerService = producerService;
     }
 
-    public Transaction transfer(TransactionRequest request, String key){
+    public Transaction transfer(Long senderId,TransactionRequest request, String key){
 
         Optional<Transaction> te = transactionRepo.findByIdempotencyKey(key);
         
@@ -36,14 +36,14 @@ public class TransactionService {
 
         tx.setReceiverId(request.getReceiverId());
         tx.setIdempotencyKey(key);
-        tx.setSenderId(request.getSenderId());
+        tx.setSenderId(senderId);
         tx.setAmount(request.getAmount());
         tx.setStatus(Status.PENDING);
         tx.setSendAt(LocalDateTime.now());
 
         tx = transactionRepo.save(tx);
 
-        Status st = walletClientService.transferService(request.getSenderId(), request.getReceiverId(), request.getAmount(), tx.getId());
+        Status st = walletClientService.transferService(senderId, request.getReceiverId(), request.getAmount(), tx.getId());
         tx.setStatus(st);
         transactionRepo.save(tx);
 
@@ -65,7 +65,7 @@ public class TransactionService {
 //    }
 
 
-    public List<Transaction> getTransaction(Long senderId){
-        return transactionRepo.findBySenderId(senderId);
+    public List<Transaction> getTransaction(Long userId){
+        return transactionRepo.findBySenderId(userId);
     }
 }
