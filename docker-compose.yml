@@ -91,9 +91,10 @@ services:
   # ─────────────────────────────────────────
 
   user-service:
-    build:
-      context: .
-      dockerfile: userservice/Dockerfile
+  #  build:
+  #    context: .
+  #    dockerfile: userservice/Dockerfile
+    image: ash8389/ewallet-user-service:latest
     container_name: ewallet-user-service
     restart: unless-stopped
     ports:
@@ -111,9 +112,10 @@ services:
         condition: service_healthy
 
   wallet-service:
-    build:
-      context: .
-      dockerfile: walletservice/Dockerfile
+  #  build:
+  #    context: .
+  #    dockerfile: walletservice/Dockerfile
+    image: ash8389/ewallet-wallet-service:latest
     container_name: ewallet-wallet-service
     restart: unless-stopped
     ports:
@@ -134,9 +136,10 @@ services:
         condition: service_healthy
 
   transaction-service:
-    build:
-      context: .
-      dockerfile: transactionservice/Dockerfile
+  #  build:
+  #    context: .
+  #    dockerfile: transactionservice/Dockerfile
+    image: ash8389/ewallet-transaction-service:latest
     container_name: ewallet-transaction-service
     restart: unless-stopped
     ports:
@@ -170,9 +173,10 @@ services:
   #       condition: service_healthy
 
   api-gateway:
-    build:
-      context: .
-      dockerfile: API-Gateway/Dockerfile
+  #  build:
+  #    context: .
+  #    dockerfile: API-Gateway/Dockerfile
+    image: ash8389/ewallet-api-gateway:latest
     container_name: ewallet-api-gateway
     restart: unless-stopped
     ports:
