@@ -1,0 +1,255 @@
+name: E-Wallet CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  JAVA_VERSION: '21'
+
+jobs:
+  build-common-dto:
+    name: Build common-dto
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Java ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: temurin
+          cache: maven
+
+      - name: Build and install common-dto
+        run: mvn -f common-dto/pom.xml install -DskipTests -q
+
+      - name: Upload common-dto to cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository/org/example/commot-dto
+          key: common-dto-${{ github.sha }}
+
+
+  build-user-sevice:
+    name: Build User Service
+    runs-on: ubuntu-latest
+    needs: build-common-dto
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: temurin
+          cache: maven
+
+      - name: Restore common-dto cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository/org/example/common-dto
+          key: common-dto-${{ github.sha }}
+
+      - name: Build User Service
+        run: mvn -f userservice/pom.xml package -DskipTests -q
+
+      - name: Upload jar
+        uses: actions/upload-artifact@v4
+        with:
+          name: user-service-jar
+          path: userservice/target/*.jar
+          retention-days: 1
+
+
+  build-wallet-sevice:
+    name: Build Wallet Service
+    runs-on: ubuntu-latest
+    needs: build-common-dto
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: temurin
+          cache: maven
+
+      - name: Restore common-dto cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository/org/example/common-dto
+          key: common-dto-${{ github.sha }}
+
+      - name: Build Wallet Service
+        run: mvn -f walletservice/pom.xml package -DskipTests -q
+
+      - name: Upload jar
+        uses: actions/upload-artifact@v4
+        with:
+          name: wallet-service-jar
+          path: walletservice/target/*.jar
+          retention-days: 1
+
+
+  build-transaction-sevice:
+    name: Build Transaction Service
+    runs-on: ubuntu-latest
+    needs: build-common-dto
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: temurin
+          cache: maven
+
+      - name: Restore common-dto cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository/org/example/common-dto
+          key: common-dto-${{ github.sha }}
+
+      - name: Build Transaction Service
+        run: mvn -f walletservice/pom.xml package -DskipTests -q
+
+      - name: Upload jar
+        uses: actions/upload-artifact@v4
+        with:
+          name: transaction-service-jar
+          path: transactionservice/target/*.jar
+          retention-days: 1
+
+
+
+  build-api-gateway:
+    name: Build API Gateway
+    runs-on: ubuntu-latest
+    needs: build-common-dto
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: temurin
+          cache: maven
+
+      - name: Build API Gateway
+        run: mvn -f API-Gateway/pom.xml package -DskipTests -q
+
+      - name: Upload jar
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-gateway-jar
+          path: API-Gateway/target/*.jar
+          retention-days: 1
+
+
+  docker-build-push:
+    name: Build & Push Dokcer Images
+    runs-on: ubuntu-latest
+    needs:
+      - build-user-service
+      - build-wallet-service
+      - build-transaction-service
+      - build-api-gateway
+    if: guthub.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: actions.checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Set image tag
+        run: echo "IMAGE_TAG=$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
+
+      - name: Build & push user-service
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: userservice/Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/ewallet-user-service:latest
+            ${{ secrets.DOCKER_USERNAME }}/ewallet-user-service:{{ env.IMAGE_TAG }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+
+      - name: Build & push wallet-service
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: walletservice/Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/ewallet-wallet-service:latest
+            ${{ secrets.DOCKER_USERNAME }}/ewallet-wallet-service:{{ env.IMAGE_TAG }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+
+      - name: Build & push wallet-service
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: walletservice/Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/ewallet-wallet-service:latest
+            ${{ secrets.DOCKER_USERNAME }}/ewallet-wallet-service:{{ env.IMAGE_TAG }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+
+      - name: Build & push transaction-service
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: transactionservice/Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/ewallet-transaction-service:latest
+            ${{ secrets.DOCKER_USERNAME }}/ewallet-transaction-service:{{ env.IMAGE_TAG }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+
+      - name: Build & push api-gateway
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: API-Gateway/Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/ewallet-api-gateway:latest
+            ${{ secrets.DOCKER_USERNAME }}/ewallet-api-gateway:{{ env.IMAGE_TAG }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+
+      - name: Print deployed image tags
+        run: |
+          echo "Images pushed with tag: ${{ enc.IMAGE_TAG }}"
+          echo "${{ secrets.DOCKER_USERNAME }}/ewallet-user-service:${{ env.IMAGE_TAG }}"
+          echo "${{ secrets.DOCKER_USERNAME }}/ewallet-wallet-service:${{ env.IMAGE_TAG }}"
+          echo "${{ secrets.DOCKER_USERNAME }}/ewallet-transaction-service:${{ env.IMAGE_TAG }}"
+          echo "${{ secrets.DOCKER_USERNAME }}/ewallet-notification-service:${{ env.IMAGE_TAG }}"
+          echo "${{ secrets.DOCKER_USERNAME }}/ewallet-api-gateway:${{ env.IMAGE_TAG }}"

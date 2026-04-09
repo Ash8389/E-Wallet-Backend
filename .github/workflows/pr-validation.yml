@@ -1,0 +1,38 @@
+name: PR Validation
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate:
+    name: Validate PR
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: temurin
+          cache: maven
+
+      - name: Build common-dto
+        run: mvn -f common-dto/pom.xml install -DskipTests -q
+
+      - name: Validate all services compile
+        run: |
+          mvn -f userservice/pom.xml compile -q
+          mvn -f walletservice/pom.xml compile -q
+          mvn -f transactionservice/pom.xml compile -q
+          mvn -f API-Gateway/pom.xml compile -q
+
+      - name: Check for hardcoded passwords or secrets
+        run: |
+          # Fail if any Java file contains a hardcoded password pattern
+          if grep -r "password\s*=\s*\"" --include="*.java" .; then
+            echo "❌ Hardcoded password found in Java files"
+            exit 1
+          fi
+          echo "✅ No hardcoded secrets found"
