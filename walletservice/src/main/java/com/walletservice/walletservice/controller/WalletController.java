@@ -4,9 +4,12 @@ import com.common.dto.Status;
 import com.walletservice.walletservice.dtos.*;
 import com.walletservice.walletservice.model.Wallet;
 import com.walletservice.walletservice.service.WalletService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.math.BigDecimal;
 
 @RestController
 @RequestMapping("/wallet")
@@ -29,7 +32,7 @@ public class WalletController {
     }
 
     @GetMapping("/balance/")
-    public Double getBalance(@RequestHeader("X-User-Id") Long userId) {
+    public BigDecimal getBalance(@RequestHeader("X-User-Id") Long userId) {
         return walletService.getBalance(userId);
     }
 
@@ -52,7 +55,7 @@ public class WalletController {
     }
 
     @PostMapping("/transfer")
-    public Status transfer(@RequestBody TransferRequest transferRequest){
+    public Status transfer(@Valid  @RequestBody TransferRequest transferRequest){
 
         System.out.println("transfer");
         return walletService.transfer(transferRequest.getSenderId(), transferRequest.getReceiverId(), transferRequest.getAmount(), transferRequest.getTransactionId());

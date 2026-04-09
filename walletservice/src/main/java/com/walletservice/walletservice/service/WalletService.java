@@ -13,6 +13,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -40,7 +41,7 @@ public class WalletService {
         Wallet wallet = new Wallet();
 
         wallet.setUserId(userId);
-        wallet.setBalance(0.0);
+        wallet.setBalance(new BigDecimal(0.0));
         wallet.setCurrency("INR");
         wallet.setCreatedAt(LocalDateTime.now());
 
@@ -52,13 +53,13 @@ public class WalletService {
                 .orElseThrow(() -> new RuntimeException("Wallet not found"));
     }
 
-    public Double getBalance(Long userId){
+    public BigDecimal getBalance(Long userId){
 
         String key = "balance:" + userId;
 
         String bal = redisTemplate.opsForValue().get(key);
         if(bal != null && !bal.isEmpty()){
-            return Double.parseDouble(bal);
+            return new BigDecimal(bal);
         }
 
         Wallet wallet = walletRepo.findByUserId(userId)
@@ -69,11 +70,11 @@ public class WalletService {
         return wallet.getBalance();
     }
 
-    public CreditResponse credit(Long senderId , Double amount){
+    public CreditResponse credit(Long senderId , BigDecimal amount){
         Wallet wallet =  walletRepo.findByUserId(senderId)
                 .orElseThrow(() -> new RuntimeException("Wallet not found"));
 
-        wallet.setBalance(wallet.getBalance() + amount);
+        wallet.setBalance(wallet.getBalance().add(amount));
         wallet = walletRepo.save(wallet);
         deleteCache(senderId);
 
@@ -84,15 +85,15 @@ public class WalletService {
         return creditResponse;
     }
 
-    public DebitResponse debit(Long receiverId, Double amount){
+    public DebitResponse debit(Long receiverId, BigDecimal amount){
         Wallet wallet =  walletRepo.findByUserId(receiverId)
                 .orElseThrow(() -> new RuntimeException("Wallet not found"));
 
-        if(wallet.getBalance() < amount){
+        if(wallet.getBalance().compareTo(amount) < 0){
             return null;
         }
 
-        wallet.setBalance(wallet.getBalance() - amount);
+        wallet.setBalance(wallet.getBalance().subtract(amount));
         walletRepo.save(wallet);
         deleteCache(receiverId);
 
@@ -104,18 +105,21 @@ public class WalletService {
     }
 
     @Transactional
-    public Status transfer(Long senderId, Long receiverId, Double amount, Long transactionId) {
+    public Status transfer(Long senderId, Long receiverId, BigDecimal amount, Long transactionId) {
         Wallet senderWallet = walletRepo.findByUserIdForUpdate(senderId)
                 .orElseThrow();
 
-        if(senderWallet.getBalance() < amount){
+        if(senderWallet.getBalance().compareTo(amount) < 0){
             return Status.FAILED;
         }
 
         Wallet receiverWallet = walletRepo.findByUserIdForUpdate(receiverId)
                 .orElseThrow();
 
-        senderWallet.setBalance(senderWallet.getBalance() - amount);
+        senderWallet.setBalance(senderWallet.getBalance().subtract(amount));
+
+
+
         WalletTransaction debit = new WalletTransaction(
                 senderWallet.getId(),
                 amount,
@@ -125,7 +129,7 @@ public class WalletService {
         deleteCache(senderId);
         walletTransactionRepo.save(debit);
 
-        receiverWallet.setBalance(receiverWallet.getBalance() + amount);
+        receiverWallet.setBalance(receiverWallet.getBalance().add(amount));
         WalletTransaction credit = new WalletTransaction(
                 receiverWallet.getId(),
                 amount,

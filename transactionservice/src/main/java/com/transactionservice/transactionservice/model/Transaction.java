@@ -3,6 +3,7 @@ package com.transactionservice.transactionservice.model;
 import com.common.dto.Status;
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -18,7 +19,7 @@ public class Transaction {
 
     private Long senderId;
 
-    private Double amount;
+    private BigDecimal amount;
 
     private Status status;
 
@@ -56,11 +57,11 @@ public class Transaction {
         this.senderId = senderId;
     }
 
-    public Double getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(Double amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 

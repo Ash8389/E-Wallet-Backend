@@ -1,9 +1,20 @@
 package com.walletservice.walletservice.dtos;
 
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotNull;
+import org.hibernate.validator.constraints.pl.NIP;
+
+import java.math.BigDecimal;
+
 public class TransferRequest {
+    @NotNull
     private Long senderId;
+    @NotNull
     private Long receiverId;
-    private Double amount;
+    @NotNull
+    @DecimalMin("0.01")
+    private BigDecimal amount;
+    @NotNull
     private Long transactionId;
 
     public Long getSenderId() {
@@ -22,11 +33,11 @@ public class TransferRequest {
         this.receiverId = receiverId;
     }
 
-    public Double getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(Double amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 

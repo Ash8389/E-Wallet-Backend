@@ -1,8 +1,18 @@
 package com.walletservice.walletservice.dtos;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotNull;
+
+import java.math.BigDecimal;
+
 public class DebitRequest {
+    @NotNull
     private Long userId;
-    private double amount;
+
+    @NotNull
+    @DecimalMin("0.01")
+    private BigDecimal amount;
 
     public Long getUserId() {
         return userId;
@@ -12,11 +22,11 @@ public class DebitRequest {
         this.userId = userId;
     }
 
-    public double getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(double amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 }

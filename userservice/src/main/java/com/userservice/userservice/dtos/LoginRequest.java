@@ -1,7 +1,12 @@
 package com.userservice.userservice.dtos;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 public class LoginRequest {
+    @NotBlank
     private String email;
+    @NotBlank
     private String password;
 
     public String getEmail() {

@@ -1,5 +1,7 @@
 package com.userservice.userservice.dtos;
 
+import jakarta.validation.constraints.NotBlank;
+
 import java.time.LocalDateTime;
 
 public class RegisterResponse {

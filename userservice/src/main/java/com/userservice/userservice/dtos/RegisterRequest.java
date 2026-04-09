@@ -1,8 +1,14 @@
 package com.userservice.userservice.dtos;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 public class RegisterRequest {
+    @NotBlank
     private String name;
+    @NotBlank
     private String email;
+    @NotBlank
     private String password;
 
     public String getName() {

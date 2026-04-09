@@ -7,6 +7,7 @@ import com.userservice.userservice.jwt.utils.JwtUtils;
 import com.userservice.userservice.model.User;
 import com.userservice.userservice.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.ResponseEntity;
@@ -39,7 +40,7 @@ public class Login {
 
     @Operation(summary = "For login user", description = "For login user")
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequest request){
+    public ResponseEntity<String> login(@Valid @RequestBody LoginRequest request){
 
         try{
             authenticationManager.authenticate(

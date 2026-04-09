@@ -5,6 +5,7 @@ import com.userservice.userservice.dtos.RegisterResponse;
 import com.userservice.userservice.dtos.UserDetail;
 import com.userservice.userservice.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import org.springframework.context.annotation.Description;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,7 @@ public class UserController {
 
     @Operation(summary = "For register user", description = "For register user")
     @PostMapping("/register")
-    public ResponseEntity<RegisterResponse> register(@RequestBody RegisterRequest registerRequest){
+    public ResponseEntity<RegisterResponse> register(@Valid @RequestBody RegisterRequest registerRequest){
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.register(registerRequest));
     }
 

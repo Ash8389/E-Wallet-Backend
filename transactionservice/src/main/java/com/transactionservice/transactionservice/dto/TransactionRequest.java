@@ -1,17 +1,16 @@
 package com.transactionservice.transactionservice.dto;
 
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotNull;
+
+import java.math.BigDecimal;
+
 public class TransactionRequest {
-    private Long senderId;
+    @NotNull
     private Long receiverId;
-    private Double amount;
-
-    public Long getSenderId() {
-        return senderId;
-    }
-
-    public void setSenderId(Long senderId) {
-        this.senderId = senderId;
-    }
+    @NotNull
+    @DecimalMin("0.01")
+    private BigDecimal amount;
 
     public Long getReceiverId() {
         return receiverId;
@@ -21,11 +20,11 @@ public class TransactionRequest {
         this.receiverId = receiverId;
     }
 
-    public Double getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(Double amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 }

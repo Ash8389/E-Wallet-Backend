@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 @Service
@@ -24,7 +25,7 @@ public class WalletClientService {
 
     @CircuitBreaker(name = "walletService", fallbackMethod = "fallbackTransaction")
     @Retry(name = "walletService")
-    public Status transferService(Long senderId, Long receiverId, Double amount, Long transactionId) {
+    public Status transferService(Long senderId, Long receiverId, BigDecimal amount, Long transactionId) {
         return restTemplate.postForObject(
                 walletServiceUrl + "/wallet/transfer",
                 Map.of(

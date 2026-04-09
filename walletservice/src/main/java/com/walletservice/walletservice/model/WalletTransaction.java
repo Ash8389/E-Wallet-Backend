@@ -5,6 +5,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -16,7 +17,7 @@ public class WalletTransaction {
 
         private Long walletId;
 
-        private Double amount;
+        private BigDecimal amount;
 
         private String type; // CREDIT / DEBIT
 
@@ -24,7 +25,7 @@ public class WalletTransaction {
 
         private LocalDateTime createdAt;
 
-    public WalletTransaction(Long walletId, Double amount, String type, Long transactionId) {
+    public WalletTransaction(Long walletId, BigDecimal amount, String type, Long transactionId) {
         this.walletId = walletId;
         this.amount = amount;
         this.type = type;
@@ -48,11 +49,11 @@ public class WalletTransaction {
         this.walletId = walletId;
     }
 
-    public Double getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(Double amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 

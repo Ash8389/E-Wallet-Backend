@@ -1,22 +1,24 @@
 package com.walletservice.walletservice.dtos;
 
-public class DebitResponse {
-    private double debit_amount;
-    private double total_amount;
+import java.math.BigDecimal;
 
-    public double getDebit_amount() {
+public class DebitResponse {
+    private BigDecimal debit_amount;
+    private BigDecimal total_amount;
+
+    public BigDecimal getDebit_amount() {
         return debit_amount;
     }
 
-    public void setDebit_amount(double debit_amount) {
+    public void setDebit_amount(BigDecimal debit_amount) {
         this.debit_amount = debit_amount;
     }
 
-    public double getTotal_amount() {
+    public BigDecimal getTotal_amount() {
         return total_amount;
     }
 
-    public void setTotal_amount(double total_amount) {
+    public void setTotal_amount(BigDecimal total_amount) {
         this.total_amount = total_amount;
     }
 }
