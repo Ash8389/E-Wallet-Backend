@@ -163,7 +163,7 @@ jobs:
       - build-wallet-service
       - build-transaction-service
       - build-api-gateway
-    if: guthub.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
     steps:
       - uses: actions.checkout@v4
