@@ -247,7 +247,7 @@ jobs:
 
       - name: Print deployed image tags
         run: |
-          echo "Images pushed with tag: ${{ enc.IMAGE_TAG }}"
+          echo "Images pushed with tag: ${{ env.IMAGE_TAG }}"
           echo "${{ secrets.DOCKER_USERNAME }}/ewallet-user-service:${{ env.IMAGE_TAG }}"
           echo "${{ secrets.DOCKER_USERNAME }}/ewallet-wallet-service:${{ env.IMAGE_TAG }}"
           echo "${{ secrets.DOCKER_USERNAME }}/ewallet-transaction-service:${{ env.IMAGE_TAG }}"
