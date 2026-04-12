@@ -44,14 +44,7 @@ public class WalletController {
     @PutMapping("/debit")
     public ResponseEntity<DebitResponse> debit(@RequestBody DebitRequest debitRequest){
 
-        System.out.println("Debit");
-        DebitResponse debit = walletService.debit(debitRequest.getUserId(), debitRequest.getAmount() );
-
-        if(debit == null){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        }
-
-        return ResponseEntity.status(HttpStatus.OK).body(debit);
+        return walletService.debit(debitRequest.getUserId(), debitRequest.getAmount() );
     }
 
     @PostMapping("/transfer")

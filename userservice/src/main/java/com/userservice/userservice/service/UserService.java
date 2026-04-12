@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.userservice.userservice.dtos.RegisterRequest;
 import com.userservice.userservice.dtos.RegisterResponse;
 import com.userservice.userservice.dtos.UserDetail;
+import com.userservice.userservice.exception.ResourceNotFoundException;
 import com.userservice.userservice.model.User;
 import com.userservice.userservice.repository.UserRepo;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -62,7 +63,7 @@ public class UserService {
         }
 
         User user = userRepo.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User Not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User Not found with email : " + email));
 
         UserDetail response = new UserDetail(
                 user.getId(),

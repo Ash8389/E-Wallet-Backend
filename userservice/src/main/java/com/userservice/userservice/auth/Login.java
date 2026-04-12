@@ -41,8 +41,6 @@ public class Login {
     @Operation(summary = "For login user", description = "For login user")
     @PostMapping("/login")
     public ResponseEntity<String> login(@Valid @RequestBody LoginRequest request){
-
-        try{
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             request.getEmail(),
@@ -51,9 +49,5 @@ public class Login {
             );
             UserDetail detail = userService.getUserDetail(request.getEmail());
             return ResponseEntity.ok(jwtUtils.generateToken(detail));
-
-        }catch (Exception e){
-            return ResponseEntity.status(401).body(e.getMessage());
-        }
     }
 }

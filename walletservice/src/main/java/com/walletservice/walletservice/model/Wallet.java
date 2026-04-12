@@ -16,11 +16,14 @@ public class Wallet {
     private Long id;
 
     @NotNull
+    @Column(nullable = false, unique = true)
     private Long userId;
 
     @Column(nullable = false)
     private BigDecimal balance;
 
+    @NotBlank
+    @Column(nullable = false)
     private String currency;
 
     private LocalDateTime createdAt;

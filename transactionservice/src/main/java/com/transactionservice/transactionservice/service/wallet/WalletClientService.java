@@ -36,7 +36,7 @@ public class WalletClientService {
                 Status.class);
     }
 
-    public Status fallbackTransaction(Long senderId, Long receiverId, Double amount, Long transactionId, Exception ex) {
+    public Status fallbackTransaction(Long senderId, Long receiverId, BigDecimal amount, Long transactionId, Exception ex) {
         System.out.println("🔥 FALLBACK CALLED: " + ex.getMessage());
 
         return Status.FAILED;

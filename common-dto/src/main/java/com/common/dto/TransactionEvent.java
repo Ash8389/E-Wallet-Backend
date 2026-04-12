@@ -1,5 +1,7 @@
 package com.common.dto;
 
+import java.math.BigDecimal;
+
 public class TransactionEvent {
     private Long transactionId;
 
@@ -7,14 +9,14 @@ public class TransactionEvent {
 
     private Long receiverWalletId;
 
-    private Double amount;
+    private BigDecimal amount;
 
     private Status status;
 
     public TransactionEvent() {
     }
 
-    public TransactionEvent(Long transactionId, Long senderWalletId, Long receiverWalletId, Double amount, Status status) {
+    public TransactionEvent(Long transactionId, Long senderWalletId, Long receiverWalletId, BigDecimal amount, Status status) {
         this.transactionId = transactionId;
         this.senderWalletId = senderWalletId;
         this.receiverWalletId = receiverWalletId;
@@ -46,11 +48,11 @@ public class TransactionEvent {
         this.senderWalletId = senderWalletId;
     }
 
-    public Double getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(Double amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 

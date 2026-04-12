@@ -25,6 +25,10 @@ public class WalletTransaction {
 
         private LocalDateTime createdAt;
 
+
+    public WalletTransaction() {
+    }
+
     public WalletTransaction(Long walletId, BigDecimal amount, String type, Long transactionId) {
         this.walletId = walletId;
         this.amount = amount;
@@ -32,6 +36,7 @@ public class WalletTransaction {
         this.transactionId = transactionId;
         this.createdAt = LocalDateTime.now();
     }
+
 
     public Long getId() {
         return id;
