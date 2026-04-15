@@ -67,20 +67,20 @@ public class WalletService {
         }
 
         Wallet wallet = walletRepo.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("Wallet not found for userId: " + userId));
+                .orElseThrow(() -> new ResourceNotFoundException("Wallet not found for userId: " + userId));
 
         redisTemplate.opsForValue().set(key, String.valueOf(wallet.getBalance()), Duration.ofMinutes(5));
 
         return wallet.getBalance();
     }
 
-    public CreditResponse credit(Long senderId , BigDecimal amount){
-        Wallet wallet =  walletRepo.findByUserId(senderId)
-                .orElseThrow(() -> new RuntimeException("Wallet not found for userId: " + senderId));
+    public CreditResponse credit(Long receiverId , BigDecimal amount){
+        Wallet wallet =  walletRepo.findByUserId(receiverId)
+                .orElseThrow(() -> new ResourceNotFoundException("Wallet not found for userId: " + receiverId));
 
         wallet.setBalance(wallet.getBalance().add(amount));
         wallet = walletRepo.save(wallet);
-        deleteCache(senderId);
+        deleteCache(receiverId);
 
         CreditResponse creditResponse = new CreditResponse();
         creditResponse.setCredit_amount(amount);
@@ -89,9 +89,9 @@ public class WalletService {
         return creditResponse;
     }
 
-    public ResponseEntity<DebitResponse> debit(Long receiverId, BigDecimal amount){
-        Wallet wallet =  walletRepo.findByUserId(receiverId)
-                .orElseThrow(() -> new RuntimeException("Wallet not found for userId: " + receiverId));
+    public DebitResponse debit(Long senderId, BigDecimal amount){
+        Wallet wallet =  walletRepo.findByUserId(senderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Wallet not found for userId: " + senderId));
 
         if(wallet.getBalance().compareTo(amount) < 0){
             throw new InsufficientBalanceException();
@@ -99,13 +99,13 @@ public class WalletService {
 
         wallet.setBalance(wallet.getBalance().subtract(amount));
         walletRepo.save(wallet);
-        deleteCache(receiverId);
+        deleteCache(senderId);
 
         DebitResponse debitResponse = new DebitResponse();
         debitResponse.setDebit_amount(amount);
         debitResponse.setTotal_amount(wallet.getBalance());
 
-        return ResponseEntity.status(HttpStatus.OK).body(debitResponse);
+        return debitResponse;
     }
 
     @Transactional
