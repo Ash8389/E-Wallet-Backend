@@ -5,17 +5,18 @@ import com.userservice.userservice.dtos.UserDetail;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
-import java.util.Map;
 import java.util.UUID;
 
 @Component
 public class JwtUtils {
 
-    String KEY = "070df949d4329a55045e2b309b106ef6";
+    @Value("${app.jwt.secret}")
+    String KEY;
 
     public String generateToken(UserDetail detail){
         return Jwts.builder()

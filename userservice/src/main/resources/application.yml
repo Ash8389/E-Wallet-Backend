@@ -1,3 +1,8 @@
+
+app:
+  jwt:
+    secret: 070df949d4329a55045e2b309b106ef6
+
 spring:
   data:
     redis:

@@ -4,6 +4,7 @@ package com.apigateway.API.Gateway.jwt.filter;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
@@ -18,7 +19,8 @@ import javax.crypto.SecretKey;
 @Component
 public class JwtFilter implements GlobalFilter, Ordered {
 
-    String KEY = "070df949d4329a55045e2b309b106ef6";
+    @Value("${app.jwt.secret}")
+    private String KEY;
     private final SecretKey key = Keys.hmacShaKeyFor(KEY.getBytes());
 
     @Override

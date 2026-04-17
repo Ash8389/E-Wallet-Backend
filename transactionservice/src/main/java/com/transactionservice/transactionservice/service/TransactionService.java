@@ -48,7 +48,7 @@ public class TransactionService {
         tx.setStatus(st);
         transactionRepo.save(tx);
 
-        producerService.produceEvent(st);
+        producerService.produceEvent(tx);
 
         return tx;
     }

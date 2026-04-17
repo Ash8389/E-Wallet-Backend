@@ -1,9 +1,7 @@
 package com.walletservice.walletservice.service;
 
 import com.common.dto.Status;
-import com.walletservice.walletservice.dtos.CreditRequest;
 import com.walletservice.walletservice.dtos.CreditResponse;
-import com.walletservice.walletservice.dtos.DebitRequest;
 import com.walletservice.walletservice.dtos.DebitResponse;
 import com.walletservice.walletservice.exception.DuplicateResourceException;
 import com.walletservice.walletservice.exception.InsufficientBalanceException;
@@ -13,15 +11,12 @@ import com.walletservice.walletservice.model.WalletTransaction;
 import com.walletservice.walletservice.repository.WalletRepo;
 import com.walletservice.walletservice.repository.WalletTransactionRepo;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service
 public class WalletService {
