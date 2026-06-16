@@ -7,6 +7,8 @@ A production-grade digital wallet system built with Java Spring Boot microservic
 ## Architecture
 
 ```
+![E-Wallet Backend Project Structure](https://raw.githubusercontent.com/Ash8389/E-Wallet-Backend/main/E-Wallet%20Backend.png)
+
 Client
   │
   ▼
