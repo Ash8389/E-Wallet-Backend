@@ -19,9 +19,12 @@ import javax.crypto.SecretKey;
 @Component
 public class JwtFilter implements GlobalFilter, Ordered {
 
-    @Value("${app.jwt.secret}")
-    private String KEY;
-    private final SecretKey key = Keys.hmacShaKeyFor(KEY.getBytes());
+
+    private final SecretKey key;
+
+    public JwtFilter(@Value("${app.jwt.secret}") String KEY){
+        key = Keys.hmacShaKeyFor(KEY.getBytes());
+    }
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
