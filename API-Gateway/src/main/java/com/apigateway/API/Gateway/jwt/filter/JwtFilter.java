@@ -28,7 +28,6 @@ public class JwtFilter implements GlobalFilter, Ordered {
 
         String path = exchange.getRequest().getURI().getPath();
 
-        // public endpoints
         if (path.contains("/users/login") || path.contains("/users/register")) {
             return chain.filter(exchange);
         }
